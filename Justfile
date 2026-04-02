@@ -36,9 +36,9 @@ test: fmt
     cargo test
 
 # Create a new release tag and push it
-release version:
+release version notes='':
     @echo "Tagging release {{version}}..."
-    git tag -a v{{version}} -m "Release v{{version}}"
+    git tag -a v{{version}} -m "Release v{{version}}: {{notes}}"
     git push origin v{{version}}
     @echo "Release tag pushed. GitHub Release will be created via CI."
 
