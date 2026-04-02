@@ -103,7 +103,8 @@ pub fn run_parent_orchestrator(args: OxideArgs) -> Result<()> {
         run_command(
             "nsenter",
             &[
-                ns_base[0], ns_base[1], ns_base[2], ns_base[3], "link", "set", &v_child, "name", "eth0",
+                ns_base[0], ns_base[1], ns_base[2], ns_base[3], "link", "set", &v_child, "name",
+                "eth0",
             ],
         )?;
         run_command(

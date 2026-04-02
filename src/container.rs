@@ -19,7 +19,7 @@ pub fn run_container_child(args: OxideArgs) -> Result<()> {
     // 1. Isolate User Namespace FIRST if rootless
     if args.rootless {
         unshare(CloneFlags::CLONE_NEWUSER).context("Failed to unshare user namespace")?;
-        
+
         println!("[Container] Setting up User Namespace ID mapping...");
         // 1. Map UID
         let uid_map = format!("0 {} 1", host_uid);
@@ -64,7 +64,8 @@ pub fn run_container_child(args: OxideArgs) -> Result<()> {
 
 fn apply_seccomp_filter() -> Result<()> {
     println!("[Container] Applying Seccomp syscall filter...");
-    let mut filter = ScmpFilterContext::new_filter(ScmpAction::Allow).context("Failed to create Seccomp context")?;
+    let mut filter = ScmpFilterContext::new_filter(ScmpAction::Allow)
+        .context("Failed to create Seccomp context")?;
 
     // Rule: Explicitly block some dangerous syscalls for demonstration
     // In a production engine, you would use an allow-list with ScmpAction::Kill
@@ -78,8 +79,11 @@ fn apply_seccomp_filter() -> Result<()> {
     ];
 
     for syscall_name in syscalls_to_block {
-        let syscall = ScmpSyscall::from_name(syscall_name).context(format!("Invalid syscall name: {}", syscall_name))?;
-        filter.add_rule(ScmpAction::Errno(libc::EPERM), syscall).context(format!("Failed to block syscall: {}", syscall_name))?;
+        let syscall = ScmpSyscall::from_name(syscall_name)
+            .context(format!("Invalid syscall name: {}", syscall_name))?;
+        filter
+            .add_rule(ScmpAction::Errno(libc::EPERM), syscall)
+            .context(format!("Failed to block syscall: {}", syscall_name))?;
     }
 
     filter.load().context("Failed to load Seccomp filter")?;
@@ -147,7 +151,8 @@ fn setup_container_env(args: OxideArgs) -> Result<()> {
     let old_root_path = merged.join(old_root_name);
     fs::create_dir_all(&old_root_path).context("Failed to create old_root dir")?;
 
-    pivot_root(merged.to_str().unwrap(), old_root_path.as_path()).context("Failed to pivot_root")?;
+    pivot_root(merged.to_str().unwrap(), old_root_path.as_path())
+        .context("Failed to pivot_root")?;
     chdir("/").context("Failed to chdir to new root")?;
 
     let old_root_path_in_container = format!("/{}", old_root_name);
@@ -159,14 +164,32 @@ fn setup_container_env(args: OxideArgs) -> Result<()> {
     // NOTE: In rootless mode, these might fail depending on host kernel policy.
     // We attempt them and continue if they fail.
     fs::create_dir_all("/proc").ok();
-    let _ = mount(Some("proc"), "/proc", Some("proc"), MsFlags::empty(), None::<&str>);
+    let _ = mount(
+        Some("proc"),
+        "/proc",
+        Some("proc"),
+        MsFlags::empty(),
+        None::<&str>,
+    );
     fs::create_dir_all("/etc").ok();
 
     fs::create_dir_all("/sys").ok();
-    let _ = mount(Some("sysfs"), "/sys", Some("sysfs"), MsFlags::empty(), None::<&str>);
+    let _ = mount(
+        Some("sysfs"),
+        "/sys",
+        Some("sysfs"),
+        MsFlags::empty(),
+        None::<&str>,
+    );
 
     fs::create_dir_all("/sys/fs/cgroup").ok();
-    let _ = mount(Some("cgroup2"), "/sys/fs/cgroup", Some("cgroup2"), MsFlags::empty(), None::<&str>);
+    let _ = mount(
+        Some("cgroup2"),
+        "/sys/fs/cgroup",
+        Some("cgroup2"),
+        MsFlags::empty(),
+        None::<&str>,
+    );
 
     let resolv_conf = "/etc/resolv.conf";
     if Path::new(resolv_conf).exists() {
