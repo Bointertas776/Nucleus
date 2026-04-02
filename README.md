@@ -43,18 +43,22 @@ Nucleus isn't trying to be a replacement for the entire Docker ecosystem; it's a
 
 ## 🚀 Getting Started
 
-### 1. Prerequisites
+### 1. Download Pre-built Binaries
+You can download the latest pre-built binaries for **x86_64** and **aarch64** from the [GitHub Releases](https://github.com/sumant1122/Nucleus/releases) page.
+
+### 2. Prerequisites
 - **OS**: Linux with Kernel 4.18+ (Cgroups v2 and OverlayFS support required).
 - **Tools**: `rustc`, `cargo`, `python3`, `iptables`, `iproute2`.
 - **Privileges**: Root access is mandatory for managing namespaces and networking.
 
-### 2. Prepare a RootFS
+### 3. Prepare a RootFS
 Nucleus requires a base directory to use as the container's root. Use the helper script to fetch a minimal Alpine Linux image:
 ```bash
 python3 pull_image.py alpine
 ```
 
-### 3. Build Nucleus
+### 4. Build Nucleus (Optional)
+If you prefer building from source:
 ```bash
 cargo build --release
 ```
